@@ -56,16 +56,18 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     private String mUsername;
     long time;
     private busCurrentInfo mbus;
+    private ListView listView;
 
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference userPrefDatabaseReference;
     private DatabaseReference requestsDatabaseReference;
     private DatabaseReference responseDataReference;
-
+    private busInfoAdapter mbusInfoAdapter;
 
 
 
     private ChildEventListener childEventListener;
+    private ChildEventListener responseChildListener;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
 
@@ -77,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     }
 
 
-    private ArrayList<busCurrentInfo> listArr;
+    private ArrayList<busCurrentInfo> listArr = new ArrayList<>();
 
 
     private ArrayList<String> busName = new ArrayList<>();
@@ -115,13 +117,14 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
         firebaseDatabase = FirebaseDatabase.getInstance();
         userPrefDatabaseReference = firebaseDatabase.getReference().child("userPref").child(userId);
         requestsDatabaseReference = firebaseDatabase.getReference().child("requests");
-        
+        responseDataReference  = firebaseDatabase.getReference().child("response");
         //*********************FireBase DataBase Ends **************//
         mGoogleApiClient.connect();
-        busInfoAdapter mbusInfoAdapter = new busInfoAdapter(MainActivity.this, listArr);
-        //  sendRequest();
-        // ListView listView = (ListView)  findViewById(R.id.list);
-        //listView.setAdapter(mbusInfoAdapter);
+        listView = (ListView) findViewById(R.id.list);
+        mbusInfoAdapter = new busInfoAdapter(MainActivity.this,R.layout.buseslistitem, listArr);
+        //  sendRequest();ListView listView = (ListView)  findViewById(R.id.list);
+        listView.setAdapter(mbusInfoAdapter);
+        //mbusInfoAdapter.addAll(listArr);
     }
 
 
@@ -234,12 +237,20 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
         if (firebaseAuth != null)
             firebaseAuth.removeAuthStateListener(authStateListener);
         removeListener();
+        removeResponseListener();
     }
 
 
     private void removeListener() {
         if (childEventListener != null) {
             userPrefDatabaseReference.removeEventListener(childEventListener);
+            childEventListener = null;
+        }
+    }
+
+    private void removeResponseListener() {
+        if (childEventListener != null) {
+            responseDataReference.removeEventListener(responseChildListener);
             childEventListener = null;
         }
     }
@@ -253,7 +264,8 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     @Override
     public void onResume() {
         super.onResume();
-
+        listArr.clear();
+        attachResponseDatabaseReadListener();
         if (mGoogleApiClient.isConnected()) {
             startLocationUpdates();
             Log.d(TAG, "Location update resumed .....................");
@@ -268,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Log.i(TAG, dataSnapshot.getKey() + "--" + dataSnapshot.getValue());
                     busName.add(dataSnapshot.getValue().toString());
-                    mbus = new busCurrentInfo(dataSnapshot.getValue().toString(), Long.toString(System.currentTimeMillis()), mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), userId);
+                    mbus = new busCurrentInfo(Long.toString(System.currentTimeMillis()), mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(),  dataSnapshot.getValue().toString(), userId);
                     requestsDatabaseReference.push().setValue(mbus);
                     Log.i(TAG, "" + busName.size());
                 }
@@ -294,6 +306,69 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
                 }
             };
             userPrefDatabaseReference.addChildEventListener(childEventListener);
+        }
+    }
+
+    private void attachResponseDatabaseReadListener() {
+        if (responseChildListener == null) {
+            responseChildListener = new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                   // Log.i(TAG, dataSnapshot.getKey() + listArr.size());
+                    mbus =  dataSnapshot.getValue(busCurrentInfo.class);
+                    Log.i(TAG, mbus.getName()+"@@@@@");
+                   // Log.i(TAG, mbus.getName());
+                    boolean flag = false;
+                    if (listArr.size() == 0){
+                        Log.i(TAG, "Zero Size");
+                        //listArr.add(mbus);
+                        mbusInfoAdapter.add(mbus);
+                        flag = true;
+                    }
+                    int i = 0;
+                    if(!flag)
+                    for (i= 0; i < listArr.size(); i++) {
+                        if (mbus.getName() == listArr.get(i).getName()) {
+                            Log.i(TAG, "Sucess--->");
+                            listArr.set(i, mbus);
+                            mbusInfoAdapter.notifyDataSetChanged();
+                            break;
+                        }
+                    }
+                    if (i == listArr.size()) {
+                        Log.i(TAG, "ADD");
+                        //listArr.add(mbus);
+                        mbusInfoAdapter.add(mbus);
+                    }
+                    Log.i(TAG, "SIze" + listArr.size());
+                    //mbusInfoAdapter.notifyDataSetChanged();
+//                    busName.add(dataSnapshot.getValue().toString());
+//                    mbus = new busCurrentInfo(dataSnapshot.getValue().toString(), Long.toString(System.currentTimeMillis()), mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), userId);
+//                    requestsDatabaseReference.push().setValue(mbus);
+//                    Log.i(TAG, "" + busName.size());
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            };
+            responseDataReference.addChildEventListener(responseChildListener);
         }
     }
 

@@ -5,29 +5,29 @@ package com.example.ydeepak.BusWala.GeneralInfo;
  */
 
 public class busCurrentInfo {
-    private String busName;
+    private String name;
     private String lastupdated;
     private double lat;
     private double log;
-    private String id;
+    private String userid;
 
     public busCurrentInfo() {
 
     }
 
-    public busCurrentInfo(String name, String time, double lat, double log, String id) {
-        this.busName = name;
+    public busCurrentInfo(String time, double lat, double log, String busName, String id) {
+        this.name = busName;
         this.lastupdated = time;
         this.log = log;
         this.lat = lat;
-        this.id = id;
+        this.userid = id;
     }
 
     public String getName() {
-        return busName;
+        return name;
     }
 
-    public String getTime() {
+    public String getLastupdated() {
         return lastupdated;
     }
 
@@ -40,10 +40,10 @@ public class busCurrentInfo {
     }
 
     public void setName(String name) {
-        this.busName = name;
+        this.name = name;
     }
 
-    public void setTime(String time) {
+    public void setLastupdated(String time) {
         this.lastupdated = time;
     }
 
@@ -55,11 +55,11 @@ public class busCurrentInfo {
         this.log = log;
     }
 
-    public String getId() {
-        return this.id;
+    public String getUserid() {
+        return this.userid;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setUserid(String id) {
+        this.userid = id;
     }
 }

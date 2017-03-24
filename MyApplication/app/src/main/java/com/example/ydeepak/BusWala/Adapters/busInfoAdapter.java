@@ -19,8 +19,8 @@ import java.util.ArrayList;
  */
 
 public class busInfoAdapter extends ArrayAdapter<busCurrentInfo> {
-    public busInfoAdapter(Activity a, ArrayList<busCurrentInfo> arr) {
-        super(a, 0, arr);
+    public busInfoAdapter(Activity a, int bb, ArrayList<busCurrentInfo> arr) {
+        super(a, bb, arr);
     }
 
     @NonNull
@@ -38,7 +38,7 @@ public class busInfoAdapter extends ArrayAdapter<busCurrentInfo> {
         t2 = (TextView) convertView.findViewById(R.id.time);
 
         t1.setText(d.getName());
-        t2.setText(d.getTime());
+        t2.setText(d.getLastupdated());
         return convertView;
     }
 }
