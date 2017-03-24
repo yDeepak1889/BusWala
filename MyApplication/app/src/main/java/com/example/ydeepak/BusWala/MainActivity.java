@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.ydeepak.BusWala.GeneralInfo.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
@@ -27,9 +28,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 
-
 import com.example.ydeepak.BusWala.GeneralInfo.busCurrentInfo;
 import com.example.ydeepak.BusWala.Adapters.busInfoAdapter;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements com.google.android.gms.location.LocationListener,
@@ -49,9 +50,12 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     private Location mCurrentLocation;
     String mLastUpdateTime;
     private String mUsername;
+    long time;
+    private busCurrentInfo mbus;
 
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference userPrefDatabaseReference;
+    private DatabaseReference requestsDatabaseReference;
 
     private ChildEventListener childEventListener;
     private FirebaseAuth firebaseAuth;
@@ -65,10 +69,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     }
 
 
-
-
-
-   private ArrayList<busCurrentInfo> listArr;
+    private ArrayList<busCurrentInfo> listArr;
 
 
     private ArrayList<String> busName = new ArrayList<>();
@@ -105,30 +106,32 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         userPrefDatabaseReference = firebaseDatabase.getReference().child("userPref").child(userId);
-
+        requestsDatabaseReference = firebaseDatabase.getReference().child("requests");
         //*********************FireBase DataBase Ends **************//
         mGoogleApiClient.connect();
         busInfoAdapter mbusInfoAdapter = new busInfoAdapter(MainActivity.this, listArr);
-       // ListView listView = (ListView)  findViewById(R.id.list);
+        //  sendRequest();
+        // ListView listView = (ListView)  findViewById(R.id.list);
         //listView.setAdapter(mbusInfoAdapter);
     }
 
 
-
-
-    private void sendRequest () {
-        
+    private void sendRequest() {
+        busCurrentInfo mbus;
+        Log.i("WOW", "" + busName.size());
+        for (int i = 0; i < busName.size(); i++) {
+            Log.i(TAG, "Success" + 1);
+            mbus = new busCurrentInfo(busName.get(i), Long.toString(System.currentTimeMillis()), mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), userId);
+            requestsDatabaseReference.push().setValue(mbus);
+        }
     }
-
-
-
 
 
     @Override
     public void onStart() {
         super.onStart();
         if (busName != null)
-        busName.clear();
+            busName.clear();
         Log.d(TAG, "onStart fired ..............");
         mGoogleApiClient.connect();
     }
@@ -236,6 +239,9 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Log.i(TAG, dataSnapshot.getKey() + "--" + dataSnapshot.getValue());
                     busName.add(dataSnapshot.getValue().toString());
+                    mbus = new busCurrentInfo(dataSnapshot.getValue().toString(), Long.toString(System.currentTimeMillis()), mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), userId);
+                    requestsDatabaseReference.push().setValue(mbus);
+                    Log.i(TAG, "" + busName.size());
                 }
 
                 @Override
