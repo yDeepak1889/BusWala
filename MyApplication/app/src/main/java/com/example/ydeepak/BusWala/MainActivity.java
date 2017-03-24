@@ -60,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference userPrefDatabaseReference;
     private DatabaseReference requestsDatabaseReference;
+    private DatabaseReference responseDataReference;
+
+
+
 
     private ChildEventListener childEventListener;
     private FirebaseAuth firebaseAuth;
@@ -111,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
         firebaseDatabase = FirebaseDatabase.getInstance();
         userPrefDatabaseReference = firebaseDatabase.getReference().child("userPref").child(userId);
         requestsDatabaseReference = firebaseDatabase.getReference().child("requests");
+        
         //*********************FireBase DataBase Ends **************//
         mGoogleApiClient.connect();
         busInfoAdapter mbusInfoAdapter = new busInfoAdapter(MainActivity.this, listArr);
@@ -136,6 +141,9 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
                 Log.i(TAG, "add");
                 updatePreference();
                 return true;
+            case R.id.settings:
+                Intent intent = new Intent(this, Settings.class);
+                startActivity (intent);
             default:
                 return super.onOptionsItemSelected(item);
         }

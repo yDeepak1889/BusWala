@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- A 'parent' preference, which enables/disables child preferences (below)
+         when checked/unchecked. -->
+    <CheckBoxPreference
+        android:key="check"
+        android:title="Ride"
+        android:defaultValue="false"/>
+
+    <EditTextPreference
+        android:enabled="true"
+        android:title="BusName"
+        android:key="busName"
+        android:inputType="text"
+        android:defaultValue="@string/default_busName"/>
+
+</PreferenceScreen>

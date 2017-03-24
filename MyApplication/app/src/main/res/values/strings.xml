@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BusWala</string>
+    <string name="default_busName">B1</string>
 </resources>
