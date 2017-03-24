@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "869410392463",
+    "firebase_url": "https://buswala-4208d.firebaseio.com",
+    "project_id": "buswala-4208d",
+    "storage_bucket": "buswala-4208d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869410392463:android:558356d9ea9f488f",
+        "android_client_info": {
+          "package_name": "com.example.ydeepak.buswala"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "869410392463-kdht63g44p8j0kbek5tln2lrf2s7lpj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZtS8JKZMQt_mIfDY_WYjN3-ka6pXgmPI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
