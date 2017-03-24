@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.ydeepak.BusWala.GeneralInfo.GeoLocation;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
 
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference userPrefDatabaseReference;
+
     private ChildEventListener childEventListener;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
@@ -69,7 +71,10 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
    private ArrayList<busCurrentInfo> listArr;
 
 
+    private ArrayList<String> busName = new ArrayList<>();
 
+    //Dummy id for testing
+    private String userId = "1";
 
 
     @Override
@@ -99,19 +104,31 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
         //*********************** FireBase DataBase Init
 
         firebaseDatabase = FirebaseDatabase.getInstance();
-        userPrefDatabaseReference = firebaseDatabase.getReference().child("user-pref");
+        userPrefDatabaseReference = firebaseDatabase.getReference().child("userPref").child(userId);
 
         //*********************FireBase DataBase Ends **************//
         mGoogleApiClient.connect();
-        mGoogleApiClient.disconnect();
         busInfoAdapter mbusInfoAdapter = new busInfoAdapter(MainActivity.this, listArr);
-
+       // ListView listView = (ListView)  findViewById(R.id.list);
+        //listView.setAdapter(mbusInfoAdapter);
     }
+
+
+
+
+    private void sendRequest () {
+        
+    }
+
+
+
 
 
     @Override
     public void onStart() {
         super.onStart();
+        if (busName != null)
+        busName.clear();
         Log.d(TAG, "onStart fired ..............");
         mGoogleApiClient.connect();
     }
@@ -173,12 +190,14 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
         Log.d(TAG, "Firing onLocationChanged..............................................");
         mCurrentLocation = location;
         Log.i(TAG, location.getLatitude() + "----" + location.getLongitude() + "----" + location.getAccuracy());
+        stopLocationUpdates();
+        mGoogleApiClient.disconnect();
+        attachDatabaseReadListener();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        stopLocationUpdates();
 
         if (firebaseAuth != null)
             firebaseAuth.removeAuthStateListener(authStateListener);
@@ -215,7 +234,8 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
             childEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    GeoLocation friendlyMessage = dataSnapshot.getValue(GeoLocation.class);
+                    Log.i(TAG, dataSnapshot.getKey() + "--" + dataSnapshot.getValue());
+                    busName.add(dataSnapshot.getValue().toString());
                 }
 
                 @Override
