@@ -1,12 +1,16 @@
 package com.example.ydeepak.BusWala;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -116,14 +120,31 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     }
 
 
-    private void sendRequest() {
-        busCurrentInfo mbus;
-        Log.i("WOW", "" + busName.size());
-        for (int i = 0; i < busName.size(); i++) {
-            Log.i(TAG, "Success" + 1);
-            mbus = new busCurrentInfo(busName.get(i), Long.toString(System.currentTimeMillis()), mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), userId);
-            requestsDatabaseReference.push().setValue(mbus);
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_id:
+                Log.i(TAG, "add");
+                updatePreference();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void updatePreference () {
+        Intent intent = new Intent(this, AddBus.class);
+        intent.putExtra("id", userId);
+        startActivity(intent);
     }
 
 

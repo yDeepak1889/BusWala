@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.example.ydeepak.BusWala.AddBus">
+
+       <TextView
+           android:layout_weight="2"
+           android:layout_width="match_parent"
+           android:layout_height="0dp" />
+
+       <EditText
+           android:id="@+id/busAddition"
+           android:layout_marginLeft="50dp"
+           android:layout_gravity="center_vertical"
+           android:layout_width="300dp"
+           android:layout_height="48dp" />
+
+       <Button
+           android:id="@+id/addBtn"
+           android:layout_marginTop="16dp"
+           android:background="#72c6f1"
+           android:layout_gravity="center_horizontal"
+           android:text="ADD"
+           android:layout_width="120dp"
+           android:layout_height="60dp" />
+
+       <TextView
+           android:layout_weight="2"
+           android:layout_width="match_parent"
+           android:layout_height="0dp" />
+
+   </LinearLayout>

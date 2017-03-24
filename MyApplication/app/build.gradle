@@ -21,10 +21,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:25.3.0'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     //FireBase Features and FireBaseUI dependencies
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.google.firebase:firebase-database:10.2.1'
     compile 'com.google.firebase:firebase-auth:10.2.1'
     compile 'com.google.firebase:firebase-storage:10.2.1'
