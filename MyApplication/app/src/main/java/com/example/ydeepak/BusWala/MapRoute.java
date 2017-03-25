@@ -21,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.ButtCap;
 import com.google.android.gms.maps.model.Cap;
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.model.Dot;
 import com.google.android.gms.maps.model.Gap;
 import com.google.android.gms.maps.model.JointType;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -41,8 +43,16 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.Nullable;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -72,7 +82,7 @@ public class MapRoute extends AppCompatActivity
 
     LatLng  [] a = new LatLng[100];
 
-    Iterable<LatLng> arr = new Iterable<LatLng>() {
+    @Nullable Iterable<LatLng> arr = new Iterable<LatLng>() {
         @Override
         public Iterator<LatLng> iterator() {
             return null;
@@ -106,7 +116,10 @@ public class MapRoute extends AppCompatActivity
     private boolean flag = false;
 
     private int count = 0;
-
+    private double userLat;
+    private double userLog;
+    private double busLat;
+    private double busLog;
     // These are the options for polyline caps, joints and patterns. We use their
     // string resource IDs as identifiers.
 
@@ -141,6 +154,26 @@ public class MapRoute extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_route);
+        Bundle extras = getIntent().getExtras();
+
+        userLat = extras.getDouble("userLat");
+        userLog = extras.getDouble("userLog");
+        busLat = extras.getDouble("busLat");
+        busLog = extras.getDouble("busLog");
+
+         a[0]= new LatLng(25.431089, 81.769663);
+
+         a[1] = new LatLng(25.430973, 81.769832);
+
+         a[2] = new LatLng(25.430251, 81.770269);
+
+         a[3] = new LatLng(25.430032, 81.770833);
+
+         a[4] = new LatLng(25.429833, 81.772248);
+
+        a[5] = new LatLng(25.429319, 81.771985);
+
+        a[6] = new LatLng(25.429513, 81.770735);
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -148,6 +181,7 @@ public class MapRoute extends AppCompatActivity
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         polylineDataReference = firebaseDatabase.getReference().child("polyline");
+        attachResponseDatabaseReadListener();
     }
 
     private String[] getResourceStrings(int[] resourceIds) {
@@ -161,33 +195,16 @@ public class MapRoute extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap map) {
 
-        Thread thread=  new Thread(){
-            @Override
-            public void run(){
-                try {
-                    synchronized(this){
-                        wait(2000);
-                    }
-                }
-                catch(InterruptedException ex){
-                }
-
-                // TODO
-            }
-        };
-
-        thread.start();
-
-
         arr = Arrays.asList(a);
-        if (arr == null) {
-            Log.i("Failure", )
-        }
+        Log.i("Success", busLat + "---" + busLog);
+        Log.i("Success", userLat + "---" + userLog);
+        map.addMarker(new MarkerOptions().position(new LatLng(userLat, userLog)).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(1*360/10)).flat(false));
+        map.addMarker(new MarkerOptions().position(new LatLng(busLat, busLog)).title("Bus Current Location").icon(BitmapDescriptorFactory.defaultMarker(2*360/10)).flat(false));
         mMutablePolyline = map.addPolyline(new PolylineOptions()
                 .color(Color.BLUE)
                 .width(6)
                 .clickable(true)
-                .addAll(arr));
+                .add(a[0], a[1], a[2], a[3], a[4], a[5], a[6]));
 
 
         mMutablePolyline.setStartCap(getSelectedCap(0));
@@ -206,6 +223,17 @@ public class MapRoute extends AppCompatActivity
                 polyline.setColor(polyline.getColor() ^ 0x00ffffff);
             }
         });
+    }
+
+    private BitmapDescriptor vectorToBitmap(@DrawableRes int id, @ColorInt int color) {
+        Drawable vectorDrawable = ResourcesCompat.getDrawable(getResources(), id, null);
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        DrawableCompat.setTint(vectorDrawable, color);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     private Cap getSelectedCap(int pos) {
@@ -267,9 +295,9 @@ public class MapRoute extends AppCompatActivity
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     mapLocations m  = dataSnapshot.getValue(mapLocations.class);
-                    a[count] = new LatLng(m.getLat(), m.getLog());
-                    Log.i("Success", count+"");
-                    count++;
+                  //  a[count] = new LatLng(m.getLat(), m.getLog());
+                    //Log.i("Success", count+"");
+                    //count++;
                 }
 
                 @Override

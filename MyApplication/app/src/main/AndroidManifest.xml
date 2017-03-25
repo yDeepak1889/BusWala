@@ -34,7 +34,8 @@
         <activity android:name=".Settings" />
         <activity
             android:name=".MapRoute"
-            android:label="Map">
+            android:label="Map"
+            android:parentActivityName=".MainActivity">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

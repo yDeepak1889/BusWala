@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ydeepak.BusWala.GeneralInfo.GeoLocation;
+import com.example.ydeepak.BusWala.GeneralInfo.mapLocations;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -26,6 +27,7 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -72,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     Calendar calendar;
 
     private ChildEventListener childEventListener;
+    private ChildEventListener mapEventListner;
     private ChildEventListener responseChildListener;
     private FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
@@ -123,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
         userPrefDatabaseReference = firebaseDatabase.getReference().child("userPref").child(userId);
         requestsDatabaseReference = firebaseDatabase.getReference().child("requests");
         responseDataReference = firebaseDatabase.getReference().child("response");
+
         //*********************FireBase DataBase Ends **************//
         mGoogleApiClient.connect();
         listView = (ListView) findViewById(R.id.list);
@@ -135,12 +139,12 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i(TAG, "Clicked");
                // mbusInfoAdapter.setNotifyOnChange(false);
-                busCurrentInfo mbus = listArr.get(position);
+                busCurrentInfo mbus = (busCurrentInfo)parent.getItemAtPosition(position);
                 Intent intent = new Intent(MainActivity.this, MapRoute.class);
-                intent.putExtra("UserLat", mCurrentLocation.getLatitude());
-                intent.putExtra("UserLog", mCurrentLocation.getLongitude());
-                intent.putExtra("BusLat", mbus.getLat());
-                intent.putExtra("BusLog", mbus.getLog());
+                intent.putExtra("userLat", mCurrentLocation.getLatitude());
+                intent.putExtra("userLog", mCurrentLocation.getLongitude());
+                intent.putExtra("busLat", mbus.getLat());
+                intent.putExtra("busLog", mbus.getLog());
 
                 startActivity(intent);
             }
