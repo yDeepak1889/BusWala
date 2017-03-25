@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +38,9 @@ import com.example.ydeepak.BusWala.GeneralInfo.busCurrentInfo;
 import com.example.ydeepak.BusWala.Adapters.busInfoAdapter;
 
 import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements com.google.android.gms.location.LocationListener,
         GoogleApiClient.ConnectionCallbacks,
@@ -63,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     private DatabaseReference requestsDatabaseReference;
     private DatabaseReference responseDataReference;
     private busInfoAdapter mbusInfoAdapter;
-
-
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy hh:mm");
+    Calendar calendar;
 
     private ChildEventListener childEventListener;
     private ChildEventListener responseChildListener;
@@ -117,16 +122,30 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
         firebaseDatabase = FirebaseDatabase.getInstance();
         userPrefDatabaseReference = firebaseDatabase.getReference().child("userPref").child(userId);
         requestsDatabaseReference = firebaseDatabase.getReference().child("requests");
-        responseDataReference  = firebaseDatabase.getReference().child("response");
+        responseDataReference = firebaseDatabase.getReference().child("response");
         //*********************FireBase DataBase Ends **************//
         mGoogleApiClient.connect();
         listView = (ListView) findViewById(R.id.list);
-        mbusInfoAdapter = new busInfoAdapter(MainActivity.this,R.layout.buseslistitem, listArr);
+        mbusInfoAdapter = new busInfoAdapter(MainActivity.this, R.layout.buseslistitem, listArr);
         //  sendRequest();ListView listView = (ListView)  findViewById(R.id.list);
         listView.setAdapter(mbusInfoAdapter);
-        //mbusInfoAdapter.addAll(listArr);
-    }
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i(TAG, "Clicked");
+               // mbusInfoAdapter.setNotifyOnChange(false);
+                busCurrentInfo mbus = listArr.get(position);
+                Intent intent = new Intent(MainActivity.this, MapRoute.class);
+                intent.putExtra("UserLat", mCurrentLocation.getLatitude());
+                intent.putExtra("UserLog", mCurrentLocation.getLongitude());
+                intent.putExtra("BusLat", mbus.getLat());
+                intent.putExtra("BusLog", mbus.getLog());
+
+                startActivity(intent);
+            }
+        });
+    }
 
 
     @Override
@@ -146,13 +165,13 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
                 return true;
             case R.id.settings:
                 Intent intent = new Intent(this, Settings.class);
-                startActivity (intent);
+                startActivity(intent);
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void updatePreference () {
+    private void updatePreference() {
         Intent intent = new Intent(this, AddBus.class);
         intent.putExtra("id", userId);
         startActivity(intent);
@@ -264,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
     @Override
     public void onResume() {
         super.onResume();
-        listArr.clear();
+        //listArr.clear();
         attachResponseDatabaseReadListener();
         if (mGoogleApiClient.isConnected()) {
             startLocationUpdates();
@@ -280,7 +299,7 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Log.i(TAG, dataSnapshot.getKey() + "--" + dataSnapshot.getValue());
                     busName.add(dataSnapshot.getValue().toString());
-                    mbus = new busCurrentInfo(Long.toString(System.currentTimeMillis()), mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(),  dataSnapshot.getValue().toString(), userId);
+                    mbus = new busCurrentInfo(Long.toString(System.currentTimeMillis()), mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude(), dataSnapshot.getValue().toString(), userId);
                     requestsDatabaseReference.push().setValue(mbus);
                     Log.i(TAG, "" + busName.size());
                 }
@@ -314,27 +333,47 @@ public class MainActivity extends AppCompatActivity implements com.google.androi
             responseChildListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                   // Log.i(TAG, dataSnapshot.getKey() + listArr.size());
-                    mbus =  dataSnapshot.getValue(busCurrentInfo.class);
-                    Log.i(TAG, mbus.getName()+"@@@@@");
-                   // Log.i(TAG, mbus.getName());
+                    // Log.i(TAG, dataSnapshot.getKey() + listArr.size());
+                    calendar = Calendar.getInstance();
+                    mbus = dataSnapshot.getValue(busCurrentInfo.class);
+                    calendar.setTimeInMillis(Long.parseLong(mbus.getLastupdated()));
+                    mbus.setLastupdated(formatter.format(calendar.getTime()));
+                    Log.i(TAG, mbus.getLastupdated());
+                    Log.i(TAG, mbus.getName() + "@@@@@");
+                    // Log.i(TAG, mbus.getName());
                     boolean flag = false;
-                    if (listArr.size() == 0){
+                    if (listArr.size() == 0) {
                         Log.i(TAG, "Zero Size");
                         //listArr.add(mbus);
                         mbusInfoAdapter.add(mbus);
                         flag = true;
                     }
                     int i = 0;
-                    if(!flag)
-                    for (i= 0; i < listArr.size(); i++) {
-                        if (mbus.getName() == listArr.get(i).getName()) {
-                            Log.i(TAG, "Sucess--->");
-                            listArr.set(i, mbus);
-                            mbusInfoAdapter.notifyDataSetChanged();
-                            break;
+                    if (!flag)
+                        for (i = 0; i < listArr.size(); i++) {
+                            if (mbus.getName() == listArr.get(i).getName()) {
+                                Log.i(TAG, "Sucess--->");
+                               // listArr.set(i, mbus);
+//                                new Thread(new Runnable()
+//                                {
+//                                    @Override
+//                                    public void run()
+//                                    {
+//                                        MainActivity.this.runOnUiThread(new Runnable() {
+//
+//                                            @Override
+//                                            public void run() {
+//                                                mbusInfoAdapter.notifyDataSetChanged();
+//                                            }
+//                                        });
+//                                        // Update your adapter.
+//
+//                                    }
+//                                }).start();
+
+                                break;
+                            }
                         }
-                    }
                     if (i == listArr.size()) {
                         Log.i(TAG, "ADD");
                         //listArr.add(mbus);

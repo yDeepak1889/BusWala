@@ -1,4 +1,24 @@
 <resources>
     <string name="app_name">BusWala</string>
     <string name="default_busName">B1</string>
+
+
+    <!-- Polyline/polygon styling -->
+    <string name="start_cap">Start cap</string>
+    <string name="end_cap">End cap</string>
+    <string name="joint_type">Joint Type</string>
+    <string name="pattern">Pattern</string>
+    <string name="cap_butt">Butt</string>
+    <string name="cap_square">Square</string>
+    <string name="cap_round">Round</string>
+    <string name="cap_image">Image</string>
+    <string name="joint_type_default">Default</string>
+    <string name="joint_type_bevel">Bevel</string>
+    <string name="joint_type_round">Round</string>
+    <string name="pattern_solid">Solid</string>
+    <string name="pattern_dotted">Dotted</string>
+    <string name="pattern_dashed">Dashed</string>
+    <string name="pattern_mixed">Mixed</string>
+
+    <string name="google_maps_key"> AIzaSyDvgZp7tUZg4X9AP2UjgThyowpQAVHOFb8</string>
 </resources>

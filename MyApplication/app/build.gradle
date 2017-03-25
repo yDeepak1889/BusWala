@@ -31,5 +31,6 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:10.2.1'
     compile 'com.firebaseui:firebase-ui:1.2.0'
     compile 'com.google.android.gms:play-services-location:10.2.1'
+    compile 'com.google.android.gms:play-services-maps:10.2.1'
 }
 apply plugin: 'com.google.gms.google-services'

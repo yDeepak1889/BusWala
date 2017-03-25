@@ -1,5 +1,7 @@
 package com.example.ydeepak.BusWala.GeneralInfo;
 
+import java.sql.Time;
+
 /**
  * Created by ydeepak on 24/3/17.
  */
@@ -16,6 +18,7 @@ public class busCurrentInfo {
     }
 
     public busCurrentInfo(String time, double lat, double log, String busName, String id) {
+        //Time t = Time.valueOf(time);
         this.name = busName;
         this.lastupdated = time;
         this.log = log;

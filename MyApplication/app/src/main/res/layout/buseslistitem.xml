@@ -4,13 +4,15 @@
     android:layout_height="104dp"
     android:orientation="horizontal"
     android:paddingBottom="16dp"
-    android:paddingTop="16dp">
+    android:paddingTop="16dp"
+    android:background="#f1f9f8"
+    android:descendantFocusability="blocksDescendants">
 
     <LinearLayout
         android:paddingLeft="24dp"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1.5"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <TextView
